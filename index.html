@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <title>Galaga Quest - Pedido Especial</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Orbitron', monospace;
+            background: radial-gradient(ellipse at center, #0a0a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e94560;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(2px 2px at 20px 30px, #ffffff, transparent),
+                              radial-gradient(2px 2px at 40px 70px, #ffffff, transparent),
+                              radial-gradient(1px 1px at 90px 40px, #ffffff, transparent),
+                              radial-gradient(1px 1px at 130px 80px, #ffffff, transparent),
+                              radial-gradient(2px 2px at 160px 30px, #ffffff, transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            animation: twinkle 4s ease-in-out infinite alternate;
+            opacity: 0.3;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.2; }
+            100% { opacity: 0.5; }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            text-shadow: 0 0 20px #38b6ff, 0 0 40px #38b6ff;
+            color: #38b6ff;
+        }
+
+        canvas {
+            background: linear-gradient(180deg, #05121d 0%, #0a1a2e 100%);
+            border: 4px solid #38b6ff;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(56, 182, 255, 0.5), inset 0 0 30px rgba(56, 182, 255, 0.1);
+            display: block;
+            position: relative;
+            z-index: 10;
+        }
+
+        #info {
+            margin: 20px 0;
+            text-align: center;
+            background: rgba(5, 18, 33, 0.8);
+            padding: 15px 25px;
+            border-radius: 25px;
+            border: 2px solid #38b6ff;
+            box-shadow: 0 0 15px rgba(56, 182, 255, 0.3);
+            z-index: 10;
+            font-size: 1.1rem;
+        }
+
+        #info strong {
+            color: #f5f542;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.5s ease;
+            z-index: 20;
+        }
+
+        .overlay.hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .box {
+            max-width: 550px;
+            background: linear-gradient(135deg, rgba(5, 18, 33, 0.95) 0%, rgba(10, 26, 46, 0.95) 100%);
+            border: 3px solid #38b6ff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(56, 182, 255, 0.6), inset 0 0 20px rgba(56, 182, 255, 0.1);
+            transform: scale(0.9);
+            animation: scaleIn 0.5s ease forwards;
+        }
+
+        @keyframes scaleIn {
+            to { transform: scale(1); }
+        }
+
+        .box p {
+            margin: 0 0 20px;
+            line-height: 1.6;
+            font-size: 1.2rem;
+        }
+
+        .box small {
+            opacity: 0.8;
+            font-size: 1rem;
+            color: #f5f542;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            canvas {
+                width: 90vw;
+                height: 90vw;
+            }
+
+            #info {
+                font-size: 1rem;
+                padding: 10px 20px;
+            }
+
+            .box {
+                padding: 20px;
+                max-width: 90vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Galaga Quest</h1>
+    </header>
+    <div id="info">
+        <strong>Setas</strong> para mover, <strong>Espaço</strong> para atirar. Faça <span id="goal">20</span> pontos.
+    </div>
+    <div style="position: relative;">
+        <canvas id="game" width="600" height="600"></canvas>
+        <div id="overlay" class="overlay hidden">
+            <div class="box">
+                <p id="overlayText">Fase 1 concluída! Clique para a Fase 2.</p>
+                <small>Clique em qualquer lugar para continuar.</small>
+            </div>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        const overlay = document.getElementById('overlay');
+        const overlayText = document.getElementById('overlayText');
+        const goalDisplay = document.getElementById('goal');
+
+        const player = { x: 270, y: 560, w: 60, h: 12, speed: 6 };
+        const bullets = [];
+        const enemies = [];
+        let enemyDir = 1;
+        let enemySpeed = 1;
+        let score = 0;
+        let scoreGoal = 20;
+        let gameState = 'play';
+        let phase = 1;
+
+        goalDisplay.textContent = scoreGoal;
+
+        function createEnemies(rows = 4, cols = 8, speed = 1) {
+            enemies.length = 0; // Clear existing enemies
+            enemySpeed = speed;
+            const size = 40;
+            const padding = 12;
+            const offsetTop = 50;
+            const offsetLeft = 30;
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    enemies.push({
+                        x: offsetLeft + col * (size + padding),
+                        y: offsetTop + row * (size + padding),
+                        w: size,
+                        h: size,
+                        alive: true
+                    });
+                }
+            }
+        }
+
+        function drawPlayer() {
+            ctx.shadowColor = '#7afcff';
+            ctx.shadowBlur = 15;
+            ctx.fillStyle = '#7afcff';
+            ctx.fillRect(player.x, player.y, player.w, player.h);
+            ctx.fillStyle = '#38b6ff';
+            ctx.fillRect(player.x + 20, player.y - 8, 20, 8);
+            ctx.shadowBlur = 0;
+        }
+
+        function drawBullets() {
+            ctx.fillStyle = '#f5f542';
+            ctx.shadowColor = '#f5f542';
+            ctx.shadowBlur = 8;
+            bullets.forEach(b => ctx.fillRect(b.x, b.y, b.w, b.h));
+            ctx.shadowBlur = 0;
+        }
+
+        function drawEnemies() {
+            ctx.fillStyle = '#ff5f7a';
+            ctx.shadowColor = '#ff5f7a';
+            ctx.shadowBlur = 10;
+            enemies.forEach(enemy => {
+                if (enemy.alive) {
+                    ctx.fillRect(enemy.x, enemy.y, enemy.w, enemy.h);
+                }
+            });
+            ctx.shadowBlur = 0;
+        }
+
+        function drawUI() {
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 20px Orbitron';
+            ctx.shadowColor = '#38b6ff';
+            ctx.shadowBlur = 5;
+            ctx.fillText(`Pontos: ${score}`, 16, 30);
+            ctx.fillText(`Fase: ${phase}`, 16, 60);
+            ctx.shadowBlur = 0;
+        }
+
+        function updateEnemies() {
+            const edge = enemies.some(e => e.alive && (e.x + e.w >= canvas.width - 10 || e.x <= 10));
+            if (edge) {
+                enemyDir *= -1;
+                enemies.forEach(e => { if (e.alive) e.y += 20; });
+            }
+            enemies.forEach(e => {
+                if (e.alive) e.x += enemyDir * enemySpeed;
+            });
+        }
+
+        function updateBullets() {
+            bullets.forEach((b, index) => {
+                b.y -= b.speed;
+                if (b.y < -10) bullets.splice(index, 1);
+            });
+        }
+
+        function checkCollisions() {
+            bullets.forEach((b, bi) => {
+                enemies.forEach((e) => {
+                    if (!e.alive) return;
+                    if (b.x < e.x + e.w &&
+                            b.x + b.w > e.x &&
+                            b.y < e.y + e.h &&
+                            b.y + b.h > e.y) {
+                        e.alive = false;
+                        bullets.splice(bi, 1);
+                        score += 1;
+                    }
+                });
+            });
+        }
+
+        function checkGameOver() {
+            // Verificar colisão com inimigos
+            enemies.forEach(e => {
+                if (!e.alive) return;
+                if (e.x < player.x + player.w &&
+                    e.x + e.w > player.x &&
+                    e.y < player.y + player.h &&
+                    e.y + e.h > player.y) {
+                    return gameOver();
+                }
+            });
+
+            // Verificar se algum inimigo passou do jogador
+            if (enemies.some(e => e.alive && e.y + e.h >= canvas.height - 20)) {
+                return gameOver();
+            }
+        }
+
+        function gameOver() {
+            gameState = 'gameOver';
+            overlayText.textContent = `Game Over! Fase ${phase} - Você conseguiu ${score} pontos.`;
+            overlay.classList.remove('hidden');
+        }
+
+        function update() {
+            if (gameState !== 'play') return;
+            updateEnemies();
+            updateBullets();
+            checkCollisions();
+            checkGameOver();
+            if (score >= scoreGoal) {
+                if (phase === 1) {
+                    overlayText.textContent = 'Fase 1 concluída! Clique para a Fase 2.';
+                } else if (phase === 2) {
+                    overlayText.textContent = 'Fase 2 concluída! Clique para ver a Fase 3';
+                }
+                gameState = 'stageComplete';
+                overlay.classList.remove('hidden');
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPlayer();
+            drawBullets();
+            drawEnemies();
+            drawUI();
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        function fireBullet() {
+            if (gameState !== 'play') return;
+            bullets.push({ x: player.x + player.w / 2 - 3, y: player.y - 14, w: 6, h: 14, speed: 7 });
+        }
+
+        const keys = {};
+        window.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+            if (e.key === ' ' || e.key === 'Spacebar') {
+                e.preventDefault();
+                fireBullet();
+            }
+        });
+        window.addEventListener('keyup', (e) => { keys[e.key] = false; });
+
+        function movePlayer() {
+            if (gameState !== 'play') return;
+            if (keys.ArrowLeft || keys.a) player.x -= player.speed;
+            if (keys.ArrowRight || keys.d) player.x += player.speed;
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.w > canvas.width) player.x = canvas.width - player.w;
+        }
+
+        function gameTick() {
+            movePlayer();
+            requestAnimationFrame(gameTick);
+        }
+
+        overlay.addEventListener('click', () => {
+            if (gameState === 'gameOver') {
+                overlay.classList.add('hidden');
+                score = 0;
+                scoreGoal = phase === 1 ? 20 : 30;
+                goalDisplay.textContent = scoreGoal;
+                createEnemies(phase === 1 ? 4 : 5, phase === 1 ? 8 : 10, phase === 1 ? 1 : 1.5);
+                gameState = 'play';
+            } else if (gameState === 'stageComplete') {
+                overlay.classList.add('hidden');
+                if (phase === 1) {
+                    phase = 2;
+                    score = 0;
+                    scoreGoal = 30;
+                    goalDisplay.textContent = scoreGoal;
+                    createEnemies(5, 10, 1.5);
+                    gameState = 'play';
+                } else if (phase === 2) {
+                    window.location.href = 'pedido.html';
+                }
+            }
+        });
+
+        createEnemies(4, 8, 1);
+        loop();
+        gameTick();
+    </script>
+</body>
+</html>

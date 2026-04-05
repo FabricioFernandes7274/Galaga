@@ -1,0 +1,177 @@
+:root {
+    --bg-neutral: #f5f5f5;
+    --card-neutral: rgba(255, 255, 255, 0.9);
+    --border-neutral: rgba(0, 0, 0, 0.1);
+    --accent-neutral: #333;
+    --text-neutral: #333;
+    --muted-neutral: #666;
+    --shadow-neutral: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    --bg-romantic: radial-gradient(circle at top, #ffe8f0 0%, #fff0f8 45%, #f6d2e6 100%);
+    --card-romantic: rgba(255, 255, 255, 0.92);
+    --border-romantic: rgba(205, 89, 153, 0.35);
+    --accent-romantic: #d14b7f;
+    --accent-soft-romantic: #ff8fc5;
+    --text-romantic: #3d1f2d;
+    --muted-romantic: #7d5365;
+    --shadow-romantic: 0 18px 45px rgba(141, 42, 100, 0.12);
+}
+
+.neutral {
+    --bg: var(--bg-neutral);
+    --card: var(--card-neutral);
+    --border: var(--border-neutral);
+    --accent: var(--accent-neutral);
+    --text: var(--text-neutral);
+    --muted: var(--muted-neutral);
+    --shadow: var(--shadow-neutral);
+}
+
+.romantic {
+    --bg: var(--bg-romantic);
+    --card: var(--card-romantic);
+    --border: var(--border-romantic);
+    --accent: var(--accent-romantic);
+    --text: var(--text-romantic);
+    --muted: var(--muted-romantic);
+    --shadow: var(--shadow-romantic);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    transition: background 1s ease, color 1s ease;
+}
+
+body.romantic::after {
+    content: '❤';
+    position: fixed;
+    top: 12vh;
+    left: 12vw;
+    font-size: 6rem;
+    color: rgba(255, 142, 174, 0.18);
+    transform: rotate(-15deg);
+    pointer-events: none;
+}
+
+.stage {
+    width: min(100%, 900px);
+    display: grid;
+    gap: 24px;
+}
+
+.dialogue {
+    display: grid;
+    gap: 18px;
+}
+
+.bubble {
+    max-width: 760px;
+    padding: 22px 26px;
+    border-radius: 28px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.86);
+    box-shadow: var(--shadow);
+    position: relative;
+    animation: floatIn 0.45s ease both;
+}
+
+.bubble[data-speaker='Narrador'] {
+    align-self: start;
+}
+
+.bubble strong {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--accent);
+    letter-spacing: 0.03em;
+}
+
+.bubble p {
+    margin: 0;
+    line-height: 1.75;
+    color: var(--text);
+}
+
+.dialogue-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 14px;
+    align-items: center;
+}
+
+.button {
+    border: none;
+    border-radius: 999px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 12px 28px rgba(209, 75, 127, 0.18);
+}
+
+.button:hover {
+    transform: translateY(-1px);
+}
+
+.button-primary {
+    background: linear-gradient(135deg, #d14b7f 0%, #ff8fc5 100%);
+    color: white;
+}
+
+.card {
+    padding: 28px;
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    background: var(--card);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    overflow: hidden;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.card h1 {
+    margin: 0 0 14px;
+    font-size: clamp(2rem, 2.4vw, 2.8rem);
+    letter-spacing: -0.05em;
+}
+
+.card p.subtitle {
+    margin: 0 0 24px;
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+@keyframes floatIn {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 720px) {
+    body {
+        padding: 16px;
+    }
+
+    .bubble {
+        padding: 18px;
+    }
+
+    .card {
+        padding: 22px;
+    }
+}
