@@ -87,7 +87,7 @@ yesButton.addEventListener('click', () => {
     setTimeout(() => {
         appendDialogue({
             speaker: 'Fabrício',
-            text: 'Independente da resposta, estarei esperando você no zap para conversarmso sobre.'
+            text: 'Independente da resposta, estarei esperando você no zap para conversarmos sobre.'
         });
         nextButton.textContent = 'Reiniciar';
         nextButton.classList.remove('hidden');
@@ -104,7 +104,7 @@ noButton.addEventListener('click', () => {
     setTimeout(() => {
         appendDialogue({
             speaker: 'Fabrício',
-            text: 'Independente da resposta, estarei esperando você no zap para conversarmso sobre.'
+            text: 'Independente da resposta, estarei esperando você no zap para conversarmos sobre.'
         });
         nextButton.textContent = 'Reiniciar';
         nextButton.classList.remove('hidden');
