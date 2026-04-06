@@ -102,6 +102,8 @@ body.romantic::after {
     margin: 0;
     line-height: 1.75;
     color: var(--text);
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .dialogue-footer {
