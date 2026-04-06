@@ -61,7 +61,7 @@ function appendDialogue(message) {
     const nameSpan = document.createElement('strong');
     nameSpan.textContent = message.speaker;
     const textPara = document.createElement('p');
-    textPara.innerHTML = message.text.replace(/\n/g, '<br>');
+    textPara.innerHTML = message.text.split('\n').map(line => line.replace(/</g, '&lt;').replace(/>/g, '&gt;')).join('<br>');
     bubble.appendChild(nameSpan);
     bubble.appendChild(textPara);
     dialogue.appendChild(bubble);
