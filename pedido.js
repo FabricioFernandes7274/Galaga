@@ -28,7 +28,21 @@ const messages = [
     },
     {
         speaker: 'Fabrício',
-        text: 'Então eu fiz esse site propositalmente por que queria que fosse uma supresa, mas'
+        text: `Isso é tudo o que sinto
+O que me mantém acordado a noite
+Ah que belo, você deve ter notado
+Não há rimas nessa verdade 
+O sentimento é tão intenso que rebate nas paredes do meu coração 
+Que nem a rima e abstração são capazes de mostrar todo meu amor 
+
+Sempre quis chegar nesse ponto
+Criar coragem para falar tudo o que sinto
+E querer te levar pro resto da vida
+Estou disposto de tudo e mais um pouco por você 
+Não posso arriscar te perder
+
+Com todo meu amor eu faço esse pedido
+Que peço de todo grande coração`
     },
     {
         speaker: 'Fabrício',
