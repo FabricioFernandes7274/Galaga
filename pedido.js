@@ -58,8 +58,12 @@ function appendDialogue(message) {
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
     bubble.dataset.speaker = message.speaker;
-    const textWithBreaks = message.text.replace(/\n/g, '<br>');
-    bubble.innerHTML = `<strong>${message.speaker}</strong><p>${textWithBreaks}</p>`;
+    const nameSpan = document.createElement('strong');
+    nameSpan.textContent = message.speaker;
+    const textPara = document.createElement('p');
+    textPara.textContent = message.text;
+    bubble.appendChild(nameSpan);
+    bubble.appendChild(textPara);
     dialogue.appendChild(bubble);
     bubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
 }
