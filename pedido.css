@@ -78,6 +78,7 @@ body.romantic::after {
 
 .bubble {
     max-width: 760px;
+    width: 100%;
     padding: 22px 26px;
     border-radius: 28px;
     border: 1px solid var(--border);
@@ -85,6 +86,7 @@ body.romantic::after {
     box-shadow: var(--shadow);
     position: relative;
     animation: floatIn 0.45s ease both;
+    word-break: break-word;
 }
 
 .bubble[data-speaker='Narrador'] {
@@ -102,8 +104,9 @@ body.romantic::after {
     margin: 0;
     line-height: 1.75;
     color: var(--text);
-    white-space: pre-wrap;
+    white-space: pre-line;
     word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .dialogue-footer {
